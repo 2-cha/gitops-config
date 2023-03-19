@@ -65,7 +65,7 @@ spec:
 
           # fetch-gitops
           - name: gitops-repo-url
-            value: gitops-backend-config
+            value: git@github.com:2-cha/gitops-backend-config.git
           - name: gitops-repo-revision
             value: main # TODO
 
