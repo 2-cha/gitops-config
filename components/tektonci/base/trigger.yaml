@@ -18,7 +18,7 @@ spec:
             - key: "MODULE_PATH"
               expression: "string('backend/dummy')" # Kustomize here
             - key: "MANIFEST_PATH"
-              expression: "string('overlays/dev')"  # Kustomize here
+              expression: "string('base/deployment.yaml')"  # Kustomize here
 
     - ref:
         name: cel

@@ -104,14 +104,15 @@ spec:
           workspace: my-workspace
           subPath: gitops
       params:
-        # TODO: prefix, suffix for manifest file (apps/, /deployment.yaml)
+        # TODO: prefix, for manifest file (apps/)
         - name: SCRIPT
           value: |-
+            >&2 echo $(ls); 
+            >&2 echo $(pwd);
             yq e '
-              with(.$(params.image-field) ; . = "$(tasks.build-push-image.results.IMAGE_URL)" | . style="") | 
+              with(.$(params.image-field) ; . = "$(tasks.build-push-image.results.IMAGE_URL)" | . style="") |
               with(.$(params.annotations-field).revision ; . = "$(params.source-repo-revision)-$(tasks.fetch-source.results.commit)" | . style="")
-            ' 
-            -i apps/$(params.module-path)/$(params.manifest-path)/deployment.yaml 
+            ' -i ./apps/$(params.module-path)/$(params.manifest-path)
 
     - name: push-to-gitops-repo
       runAfter: [ "update-manifest" ]
@@ -129,7 +130,9 @@ spec:
         - name: GIT_USER_EMAIL
           value: $(params.committer-email)
         - name: GIT_SCRIPT
-          value: |
-            git add -u
-            git commit -m "[tekton] updated by $(params.committer-name)" -m "ref: $(params.head-commit-url)"
-            git push
+          value: |-
+            >&2 echo $(ls); 
+            >&2 echo $(pwd);
+#            git add -u
+#            git commit -m "[tekton] updated by $(params.committer-name)" -m "ref: $(params.head-commit-url)"
+#            git push
