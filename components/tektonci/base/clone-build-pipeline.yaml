@@ -32,7 +32,8 @@ spec:
 
   workspaces:
     - name: my-workspace
-    - name: git-credentials
+    - name: source-repo-credentials
+    - name: gitops-repo-credentials
     - name: dockerhub-credentials
 
   tasks:
@@ -43,7 +44,7 @@ spec:
         - name: output
           workspace: my-workspace
         - name: ssh-directory
-          workspace: git-credentials
+          workspace: source-repo-credentials
       params:
         - name: url
           value: $(params.source-repo-url)
@@ -83,7 +84,7 @@ spec:
         - name: output
           workspace: my-workspace
         - name: ssh-directory
-          workspace: git-credentials
+          workspace: gitops-repo-credentials
       params:
         - name: url
           value: $(params.gitops-repo-url)
@@ -121,7 +122,7 @@ spec:
           workspace: my-workspace
           subPath: gitops
         - name: ssh-directory
-          workspace: git-credentials
+          workspace: gitops-repo-credentials
       params:
         - name: GIT_USER_NAME
           value: $(params.committer-name)

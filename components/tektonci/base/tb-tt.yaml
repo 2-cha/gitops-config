@@ -96,10 +96,12 @@ spec:
                 resources:
                   requests:
                     storage: 1Gi
-          - name: git-credentials
+          - name: source-repo-credentials
             secret:
-              secretName: tekton-git-credentials
-
+              secretName: source-repo-credentials
+          - name: gitops-repo-credentials
+            secret:
+              secretName: gitops-repo-credentials
           - name: dockerhub-credentials
             secret:
-              secretName: tekton-dockerhub-credentials
+              secretName: dockerhub-credentials
