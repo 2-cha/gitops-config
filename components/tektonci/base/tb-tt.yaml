@@ -75,7 +75,7 @@ spec:
           - name: manifest-file
             value: $(tt.params.manifest-file)
           - name: image-field
-            value: spec.template.spec.containers[0].name
+            value: spec.template.spec.containers[0].image
           - name: annotations-field
             value: metadata.annotations
 
