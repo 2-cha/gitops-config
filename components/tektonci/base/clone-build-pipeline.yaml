@@ -132,4 +132,8 @@ spec:
             git config --global --add safe.directory /workspace/source
             git add -u
             git commit -m "[tekton] updated by $(params.committer-name)" -m "ref: $(params.head-commit-url)"
+            hash=$(git log -1 --format="%H")
+            git checkout $(params.gitops-repo-revision)
+            git cherry-pick ${hash}
             git push
+            
