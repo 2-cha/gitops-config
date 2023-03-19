@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-service
+  annotations:
+    revision: demo-735f0d7a94dd6259850a19ba07b0aac9063e5d27
 spec:
   # ReplicaSet 정의
   replicas: 3
@@ -18,7 +20,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: spring-boot
+        - name: m1nq/my-first-app:demo-735f0d7a94dd6259850a19ba07b0aac9063e5d27
           image: m1nq/my-first-app:latest
           imagePullPolicy: Always
           ports:
