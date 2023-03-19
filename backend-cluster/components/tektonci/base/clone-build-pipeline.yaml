@@ -1,0 +1,134 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-build
+  namespace: tektonci
+spec:
+  params:
+    # fetch-source
+    - name: source-repo-url
+    - name: source-repo-revision
+
+    # build-push-image
+    - name: image-name
+    - name: build-context
+    - name: builder-image
+    - name: dockerfile
+
+    # fetch-gitops
+    - name: gitops-repo-url
+    - name: gitops-repo-revision
+
+    # update-manifest
+    - name: module-path
+    - name: manifest-path
+    - name: image-field
+    - name: annotations-field
+
+    # push-to-gitops-repo
+    - name: head-commit-url
+    - name: committer-name
+    - name: committer-email
+
+  workspaces:
+    - name: my-workspace
+    - name: git-credentials
+    - name: dockerhub-credentials
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: my-workspace
+        - name: ssh-directory
+          workspace: git-credentials
+      params:
+        - name: url
+          value: $(params.source-repo-url)
+        - name: revision
+          value: $(params.source-repo-revision)
+        - name: subdirectory
+          value: source
+        - name: deleteExisting
+          value: true
+
+    - name: build-push-image
+      runAfter: [ "fetch-source" ]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: my-workspace
+          subPath: source
+        - name: dockerconfig
+          workspace: dockerhub-credentials
+      params:
+        - name: IMAGE
+          value: $(params.image-name):$(params.source-repo-revision)-$(tasks.fetch-source.results.commit)
+        - name: CONTEXT
+          value: $(params.build-context)
+        - name: BUILDER_IMAGE
+          value: $(params.builder-image)
+        - name: DOCKERFILE
+          value: $(params.dockerfile)
+
+
+    - name: fetch-gitops
+      runAfter: [ "build-push-image" ]
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: my-workspace
+        - name: ssh-directory
+          workspace: git-credentials
+      params:
+        - name: url
+          value: $(params.gitops-repo-url)
+        - name: revision
+          value: $(params.gitops-repo-revision)
+        - name: subdirectory
+          value: gitops
+        - name: deleteExisting
+          value: true
+
+    - name: update-manifest
+      runAfter: [ "fetch-gitops" ]
+      taskRef:
+        name: yq
+      workspaces:
+        - name: source
+          workspace: my-workspace
+          subPath: gitops
+      params:
+        # TODO: prefix, suffix for manifest file (apps/, /deployment.yaml)
+        - name: SCRIPT
+          value: |-
+            yq e '
+              with(.$(params.image-field) ; . = "$(tasks.build-push-image.results.IMAGE_URL)" | . style="") | 
+              with(.$(params.annotations-field).revision ; . = "$(params.source-repo-revision)-$(tasks.fetch-source.results.commit)" | . style="")
+            ' 
+            -i apps/$(params.module-path)/$(params.manifest-path)/deployment.yaml 
+
+    - name: push-to-gitops-repo
+      runAfter: [ "update-manifest" ]
+      taskRef:
+        name: git-cli
+      workspaces:
+        - name: source
+          workspace: my-workspace
+          subPath: gitops
+        - name: ssh-directory
+          workspace: git-credentials
+      params:
+        - name: GIT_USER_NAME
+          value: $(params.committer-name)
+        - name: GIT_USER_EMAIL
+          value: $(params.committer-email)
+        - name: GIT_SCRIPT
+          value: |
+            git add -u
+            git commit -m "[tekton] updated by $(params.committer-name)" -m "ref: $(params.head-commit-url)"
+            git push

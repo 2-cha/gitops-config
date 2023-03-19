@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-gateway
+  labels:
+    tier: backend
+  annotations:
+    alb.ingress.kubernetes.io/tags: tier=backend
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/load-balancer-name: backend-alb
+
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: demo-service
+                port:
+                  number: 80
+#          - pathType: Prefix
+#            path: /user
+#            backend:
+#              service:
+#                name: user-service
+#                port:
+#                  number: 80
+
+# https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations
+# Security Groups을 명시적으로 지정하지 않으면 자동으로 생성된다
+# alb.ingress.kubernetes.io/security-groups: ApplicationLoadBalancerGroup # Name matches a Name tag, not the groupName attribute.
+# external-dns specific configuration for creating route53 record-set
+# external-dns.alpha.kubernetes.io/hostname: app.example.com

@@ -1,0 +1,51 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: trigger # Kustomize here
+  namespace: tektonci
+spec:
+  bindings:
+    - ref: trigger-binding
+  template:
+    ref: trigger-template
+  interceptors:
+    # inject Parameter
+    - ref:
+        name: cel
+      params:
+        - name: "overlays"
+          value:
+            - key: "MODULE_PATH"
+              expression: "string('backend/dummy')" # Kustomize here
+            - key: "MANIFEST_PATH"
+              expression: "string('overlays/dev')"  # Kustomize here
+
+    - ref:
+        name: cel
+      params:
+        # filter changed files
+        - name: "filter"
+          value: |-
+            body.commits.exists(
+              commit,
+              commit.added.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+              commit.modified.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+              commit.removed.exists(e, e.startsWith(extensions.MODULE_PATH))
+            ) && 
+            body.ref.split('/')[2] == 'demo'
+
+        # pass to TriggerBinding
+        - name: "overlays"
+          value:
+            - key: source-repo-revision
+              expression: "body.ref.split('/')[2]"
+            - key: head-commit-url
+              expression: "body.head_commit.url"
+            - key: committer-name
+              expression: "body.head_commit.committer.name"
+            - key: committer-email
+              expression: "body.head_commit.committer.email"
+            - key: module-path
+              expression: 'extensions.MODULE_PATH'
+            - key: manifest-path
+              expression: 'extensions.MANIFEST_PATH'

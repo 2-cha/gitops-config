@@ -1,0 +1,15 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  #  name: webhook-$(PARAM)-listener
+  name: webhook-listener
+  namespace: tektonci
+spec:
+  serviceAccountName: tekton-robot
+  resources:
+    kubernetesResource:
+      serviceType: NodePort
+      servicePort: 8080
+  triggers:
+    - triggerRef: trigger
+      # Add new triggers with kubectl patch

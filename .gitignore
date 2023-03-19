@@ -1,0 +1,10 @@
+*credential*
+*id_rsa*
+config.json
+config
+.idea
+.idea/**
+.code
+*.crt
+*.pem
+*.key

@@ -1,0 +1,105 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: trigger-binding
+  namespace: tektonci
+spec:
+  params:
+    - name: source-repo-url
+      value: $(body.repository.ssh_url)
+    - name: source-repo-revision
+      value: $(extensions.source-repo-revision)
+    - name: head-commit-url
+      value: $(extensions.head-commit-url)
+    - name: committer-name
+      value: $(extensions.committer-name)
+    - name: committer-email
+      value: $(extensions.committer-email)
+    - name: module-path
+      value: $(extensions.module-path)
+    - name: manifest-path
+      value: $(extensions.manifest-path)
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: trigger-template
+  namespace: tektonci
+spec:
+  params:
+    - name: source-repo-url
+    - name: source-repo-revision
+    - name: module-path
+    - name: manifest-path
+    - name: head-commit-url
+    - name: committer-name
+    - name: committer-email
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: clone-build-run-
+      spec:
+        pipelineRef:
+          name: clone-build
+        podTemplate:
+          securityContext:
+            fsGroup: 65532
+        params:
+          # fetch-source
+          - name: source-repo-url
+            value: $(tt.params.source-repo-url)
+          - name: source-repo-revision
+            value: $(tt.params.source-repo-revision)
+
+          # build-push-image
+          - name: image-name
+            value: m1nq/my-first-app
+          - name: build-context
+            value: ./$(tt.params.module-path)
+          - name: builder-image
+            value: gcr.io/kaniko-project/executor:latest
+          - name: dockerfile
+            value: $(params.build-context)/Dockerfile
+
+          # fetch-gitops
+          - name: gitops-repo-url
+            value: gitops-backend-config
+          - name: gitops-repo-revision
+            value: main # TODO
+
+          # update-manifest
+          - name: module-path
+            value: $(tt.params.module-path)
+          - name: manifest-path
+            value: $(tt.params.manifest-path)
+          - name: image-field
+            value: spec.template.spec.containers[0].name
+          - name: annotations-field
+            value: metadata.annotations
+
+          # push-to-gitops-repo
+          - name: head-commit-url
+            value: $(tt.params.head-commit-url)
+          - name: committer-name
+            value: $(tt.params.committer-name)
+          - name: committer-email
+            value: $(tt.params.committer-email)
+
+        workspaces:
+          - name: my-workspace
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - name: git-credentials
+            secret:
+              secretName: tekton-git-credentials
+
+          - name: dockerhub-credentials
+            secret:
+              secretName: tekton-dockerhub-credentials
