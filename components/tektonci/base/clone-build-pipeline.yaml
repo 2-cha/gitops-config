@@ -21,7 +21,7 @@ spec:
 
     # update-manifest
     - name: module-path
-    - name: manifest-path
+    - name: manifest-file
     - name: image-field
     - name: annotations-field
 
@@ -112,7 +112,7 @@ spec:
             yq e '
               with(.$(params.image-field) ; . = "$(tasks.build-push-image.results.IMAGE_URL)" | . style="") |
               with(.$(params.annotations-field).revision ; . = "$(params.source-repo-revision)-$(tasks.fetch-source.results.commit)" | . style="")
-            ' -i ./apps/$(params.module-path)/$(params.manifest-path)
+            ' -i ./apps/$(params.module-path)/$(params.manifest-file)
 
     - name: push-to-gitops-repo
       runAfter: [ "update-manifest" ]

@@ -17,8 +17,8 @@ spec:
       value: $(extensions.committer-email)
     - name: module-path
       value: $(extensions.module-path)
-    - name: manifest-path
-      value: $(extensions.manifest-path)
+    - name: manifest-file
+      value: $(extensions.manifest-file)
 
 ---
 apiVersion: triggers.tekton.dev/v1beta1
@@ -31,7 +31,7 @@ spec:
     - name: source-repo-url
     - name: source-repo-revision
     - name: module-path
-    - name: manifest-path
+    - name: manifest-file
     - name: head-commit-url
     - name: committer-name
     - name: committer-email
@@ -72,8 +72,8 @@ spec:
           # update-manifest
           - name: module-path
             value: $(tt.params.module-path)
-          - name: manifest-path
-            value: $(tt.params.manifest-path)
+          - name: manifest-file
+            value: $(tt.params.manifest-file)
           - name: image-field
             value: spec.template.spec.containers[0].name
           - name: annotations-field

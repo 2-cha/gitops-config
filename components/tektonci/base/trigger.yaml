@@ -17,7 +17,7 @@ spec:
           value:
             - key: "MODULE_PATH"
               expression: "string('backend/dummy')" # Kustomize here
-            - key: "MANIFEST_PATH"
+            - key: "MANIFEST_FILE"
               expression: "string('base/deployment.yaml')"  # Kustomize here
 
     - ref:
@@ -47,5 +47,5 @@ spec:
               expression: "body.head_commit.committer.email"
             - key: module-path
               expression: 'extensions.MODULE_PATH'
-            - key: manifest-path
-              expression: 'extensions.MANIFEST_PATH'
+            - key: manifest-file
+              expression: 'extensions.MANIFEST_FILE'
