@@ -111,7 +111,7 @@
 
 1. `EventListener`가 Source Repository의 Webhook을 수신합니다.
 2. `EventListener`는 등록된 `Trigger`들에게 해당 Payload를 전달합니다.
-3. 그림 상 `Filter` 역할을 하는 `Interceptor`가 Payload의 **수정/추가/삭제**된 파일을 체크합니다. 미리 등록된 **MODULE_PATH**와
+3. 그림 상 `Filter` 역할을 하는 `Interceptor`가 Github Push Event의 모든 커밋에서 **수정/추가/삭제**된 파일을 체크합니다. 미리 등록된 **MODULE_PATH**와
    일치하면 트리거가 동작합니다.
 4. `Trigger`는 미리 작성된 `Pipeline`에 파라미터를 넘겨주며 실행시킵니다.
 
