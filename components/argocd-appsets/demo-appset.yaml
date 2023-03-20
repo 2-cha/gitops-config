@@ -10,8 +10,8 @@ spec:
     - list:
         elements:
           - env: dev
-          - env: stage
-          - env: prod
+  #          - env: stage # TODO: Deployment/demo-service is part of applications argocd/demo-service-prod and demo-service-stage...
+  #          - env: prod  # TODO: gradually promote
   template:
     metadata:
       name: 'demo-service-{{env}}'
@@ -21,9 +21,9 @@ spec:
     spec:
       project: default
       source:
-        repoURL: git@github.com:2-cha/gitops-backend-config.git
-        targetRevision: HEAD #TODO
-        path: apps/demo/{{env}}
+        repoURL: git@github.com:2-cha/gitops-config.git
+        targetRevision: main
+        path: apps/backend/demo/overlays/{{env}} #TODO: kustomize
       destination:
         server: https://kubernetes.default.svc
         namespace: default
