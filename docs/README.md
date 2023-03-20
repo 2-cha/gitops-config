@@ -1,20 +1,15 @@
 # GitOps using Tekton and Argo
-<div>
-  <img style="display: inline-grid"  height="150" width="300" src="https://www.vectorlogo.zone/logos/kubernetes/kubernetes-ar21.png">
-  <img style="display: inline-grid"  height="170" width="300" 
-  src="https://raw.githubusercontent.com/cdfoundation/artwork/main/tekton/horizontal/color/tekton-horizontal-color.svg">
-</div>
-<div>
-  <img style="display: inline-grid"  height="130" width="300" src="https://github.com/argoproj/argoproj/raw/master/docs/assets/argo.png">
-  <img style="display: inline-grid"  height="110" width="300" src="https://github.com/GoogleContainerTools/kaniko/raw/main/logo/Kaniko-Logo.png">
-<div>
+---
 
+![](assets/cicd.png)
 
 ## Requirements
 
 - Kubernetes Cluster: Tekton과 ArgoCD가 배포될 클러스터가 필요합니다. 현재 kOps로 EC2에 배포되어 있습니다.
 - [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller):
   Ingress 리소스를 ALB로 제공하기 위해 필요합니다. kOps의 add-on으로 설치되어 있습니다.
+
+## Structure
 
 ```
 ├── apps
@@ -99,16 +94,32 @@
 
 | Directory  | Description                                                                                                                                                                                                                                                                                                                                         |
 |------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| bootstrap  | 클러스터 설정을 부트스트랩핑하는 항목입니다.<br />일반적으로 CRD 혹은 설치 매니페스트입니다. <br/><br />- `base` : 기본이 되는 설정입니다. ArgoCD, Tekton 매니페스트를 설치합니다.<br />- `overlays`: 클러스터 별 설정입니다.<br />현재 `overlays/default`는 `components` 및 `core`를 포함하고 있습니다.                                                                                                                              |
+| bootstrap  | 클러스터 설정을 부트스트랩핑하는 항목입니다.<br />일반적으로 CRD 혹은 설치 매니페스트입니다. <br/><br />- `base` : 기본이 되는 설정입니다. ArgoCD, Tekton 매니페스트를 설치합니다.<br />- `overlays`: 클러스터 별 설정입니다.<br />현재 `overlays/default`는 `components` 및 `core`를 포함하고 있습니다.                                                                                                                             |
 | core       | 클러스터 관련 YAML이 위치하는 곳입니다. 현재 `secrets`에 imagePullSecret이, `ingresses`에 백엔드 ALB 인그레스가 포함되어 있습니다.                                                                                                                                                                                                                                                      |
 | components | GitOps 컨트롤러의 구성 요소가 있는 곳입니다.<br />Tekton, ArgoCD의 구성이 이 곳에 들어갑니다.<br /><br />기본적으로 리소스 접근을 위한 `RBAC`, 레포지토리 접근을 위한 `Secret`, 각 컨트롤러를 노출하기 위한 `Ingress` 등이 포함될 수 있습니다.<br /><br />- `tektonci`: 상기 기본 구성 외에, CI 파이프라인 및 웹훅 트리거 등으로 구성되어 있습니다. <br />- `argocd`: 기본 구성 외에, `ApplicationSet`, `AppProject` 등이 포함됩니다. 현재 `demo-appset`이 기본으로 구성되어 있습니다. |
-| apps       | 배포 대상 워크로드가 있는 곳입니다.<br /><br />Tekton에 의해 deployment가 업데이트 되며,<br />ArgoCD에 의해 배포됩니다.<br /><br /><br />                                                                                                                                                                                                                                            |
+| apps       | 배포 대상 워크로드가 있는 곳입니다.<br /><br />Tekton에 의해 deployment가 업데이트 되며,<br />ArgoCD에 의해 배포됩니다.<br />                                                                                                                                                                                                                                                        |
 
 ## How does it work?
 
-1. <!-- TODO: 전체 워크플로 이미지 넣기   -->  
-2. <!-- TODO: 이벤트리스너-파이프라인-트리거 구조 이미지 넣기 --> 
-3. <!-- TODO: AWS 구조 넣을지 말지? -->
+### Tekton
+
+![](assets/tekton.png)
+> 이해의 편의를 위해 그림 및 설명에 일부 생략된 요소가 있습니다.
+
+레포지토리 구조상 `Webhook`을 **단일 엔드포인트**로 수신하고 있기 때문에, <u>Path 기반 라우팅을 할 수 없습니다</u>.  
+따라서 다음과 같은 프로세스를 거칩니다.
+
+1. `EventListener`가 Source Repository의 Webhook을 수신합니다.
+2. `EventListener`는 등록된 `Trigger`들에게 해당 Payload를 전달합니다.
+3. 그림 상 `Filter` 역할을 하는 `Interceptor`가 Payload의 **수정/추가/삭제**된 파일을 체크합니다. 미리 등록된 **MODULE_PATH**와
+   일치하면 트리거가 동작합니다.
+4. `Trigger`는 미리 작성된 `Pipeline`에 파라미터를 넘겨주며 실행시킵니다.
+
+현재는 빌드 및 배포 대상이 되는 경로만 다르고 빌드 과정이 모두 같기 때문에,  
+같은 `Pipeline`을 이용하며 MODULE_PATH만 파라미터로 넘겨 대상을 결정합니다.
+
+
+<!-- TODO: AWS 구조 넣을지 말지? -->
 
 ## How to use?
 
