@@ -1,7 +1,6 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  #  name: webhook-$(PARAM)-listener
   name: webhook-listener
   namespace: tektonci
 spec:
@@ -12,4 +11,5 @@ spec:
       servicePort: 8080
   triggers:
     - triggerRef: trigger
-      # Add new triggers with kubectl patch
+      # Add new triggers with:
+      # kubectl patch el webhook-listener -n tektonci --type "json" --patch-file listener-patch.json

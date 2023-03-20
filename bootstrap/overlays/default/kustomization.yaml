@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - ../../base
-  - ../../../components/rbacs
-  - ../../../components/secrets
+  - ../../../core
+  - ../../../components/tektonci
+  - ../../../components/argocd

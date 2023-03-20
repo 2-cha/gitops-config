@@ -18,12 +18,12 @@ metadata:
 spec:
   ingressClassName: alb
   rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          service:
-            name: argocd-server
-            port:
-              number: 80
-        pathType: Prefix
+    - http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
+            pathType: Prefix

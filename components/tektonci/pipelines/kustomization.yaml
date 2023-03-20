@@ -7,7 +7,3 @@ resources:
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/yq/0.4/yq.yaml
   - clone-build-pipeline.yaml
-  - webhook-listener.yaml
-  - webhook-listener-ingress.yaml
-  - tb-tt.yaml
-  - trigger.yaml

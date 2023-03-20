@@ -9,9 +9,9 @@ spec:
   generators:
     - list:
         elements:
-          - env: dev
-  #          - env: stage # TODO: Deployment/demo-service is part of applications argocd/demo-service-prod and demo-service-stage...
-  #          - env: prod  # TODO: gradually promote
+          - env: dev # TODO: gradually promote
+        # - env: stage
+        # - env: prod
   template:
     metadata:
       name: 'demo-service-{{env}}'
