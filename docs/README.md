@@ -116,13 +116,14 @@
 4. `Trigger`는 미리 작성된 `Pipeline`에 파라미터를 넘겨주며 실행시킵니다.
 
 현재는 빌드 및 배포 대상이 되는 경로만 다르고 빌드 과정이 모두 같기 때문에,  
-같은 `Pipeline`을 이용하며 MODULE_PATH만 파라미터로 넘겨 대상을 결정합니다.
+같은 `Pipeline`을 이용하며 **MODULE_PATH**만 파라미터로 넘겨 대상을 결정합니다.
 
-
+### ArgoCD
+**TODO**
 <!-- TODO: AWS 구조 넣을지 말지? -->
 
 ## How to use?
-
+**TODO**
 <!-- TODO 
 ### 새 배포 대상 추가하기
 #### overlay `Trigger`
@@ -135,3 +136,4 @@
 --> 
 
 ## Examples
+**TODO**
