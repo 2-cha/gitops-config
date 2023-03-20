@@ -1,9 +1,14 @@
 # GitOps using Tekton and Argo
+<div>
+  <img style="display: inline-grid"  height="150" width="300" src="https://www.vectorlogo.zone/logos/kubernetes/kubernetes-ar21.png">
+  <img style="display: inline-grid"  height="170" width="300" 
+  src="https://raw.githubusercontent.com/cdfoundation/artwork/main/tekton/horizontal/color/tekton-horizontal-color.svg">
+</div>
+<div>
+  <img style="display: inline-grid"  height="130" width="300" src="https://github.com/argoproj/argoproj/raw/master/docs/assets/argo.png">
+  <img style="display: inline-grid"  height="110" width="300" src="https://github.com/GoogleContainerTools/kaniko/raw/main/logo/Kaniko-Logo.png">
+<div>
 
-![Logo](https://www.vectorlogo.zone/logos/kubernetes/kubernetes-ar21.png)
-![Logo](https://raw.githubusercontent.com/cdfoundation/artwork/main/tekton/horizontal/color/tekton-horizontal-color.svg)
-![Logo](https://github.com/argoproj/argoproj/raw/master/docs/assets/argo.png)
-![Logo](https://github.com/GoogleContainerTools/kaniko/raw/main/logo/Kaniko-Logo.png)
 
 ## Requirements
 
