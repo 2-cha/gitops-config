@@ -162,9 +162,9 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 **TODO**
 
 # TODO
-
-- [ ] apply CI to main branch
-- [ ] deploy some app instead of demo-service
+:::note
+:::
+- [x] apply CI to main branch
 - [ ] tekton GC
 - [ ] inject configurations
 - [ ] automate gradual promotion
@@ -174,5 +174,4 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 - [ ] apply autoscaling
 - [ ] complete README
     - [ ] How to add new application
-    - [ ] Deployment, Service and Ingress structure
     - else?
