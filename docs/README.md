@@ -104,7 +104,7 @@
 ### Tekton
 
 ![](assets/tekton.png)
-> 이해의 편의를 위해 그림 및 설명에 일부 생략된 요소가 있습니다.
+> **Note** 이해의 편의를 위해 그림 및 설명에 일부 생략된 요소가 있습니다.
 
 레포지토리 구조상 `Webhook`을 **단일 엔드포인트**로 수신하고 있기 때문에, <ins>Path 기반 라우팅을 할 수 없습니다</ins>.  
 따라서 다음과 같은 프로세스를 거칩니다.
@@ -162,11 +162,10 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 **TODO**
 
 # TODO
-:::note
-:::
+
 - [x] apply CI to main branch
-- [ ] tekton GC
-- [ ] inject configurations
+- [ ] <ins>tekton GC</ins>
+- [ ] <ins>inject configurations</ins>
 - [ ] automate gradual promotion
 - [ ] deploy prometheus, grafana
 - [ ] deploy Elastic stack
