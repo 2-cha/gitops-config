@@ -165,6 +165,7 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 
 - [ ] apply CI to main branch
 - [ ] deploy some app instead of demo-service
+- [ ] tekton GC
 - [ ] inject configurations
 - [ ] automate gradual promotion
 - [ ] deploy prometheus, grafana
