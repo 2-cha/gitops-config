@@ -146,6 +146,7 @@
 
 - [ ] apply CI to main branch
 - [ ] deploy some app instead of demo-service
+- [ ] inject configurations
 - [ ] automate gradual promotion
 - [ ] deploy prometheus, grafana
 - [ ] deploy Elastic stack
