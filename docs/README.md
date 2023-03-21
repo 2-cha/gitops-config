@@ -139,16 +139,23 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 ## How to use?
 
 **TODO**
-<!-- TODO 
+
 ### 새 배포 대상 추가하기
+
 #### overlay `Trigger`
-    Spring Boot 앱이라면 MODULE_PATH만 패치하고, Pipeline 재사용
+
+    Spring Boot 앱이라면 `Trigger`의 MODULE_PATH만 패치하고, Pipeline 재사용
+    혹은 새로운 Pipeline도 함께 추가
+
 #### patch `EventListener`
+
     `EventListener`에 새 `Trigger` 추가
+
 #### apps/<MODULE_PATH> 에 `Deploy`, `Service` 추가
+
     source repository와 일치
-#### Application(Set) 추가 
---> 
+
+#### Application(Set) 추가
 
 ## Examples
 
