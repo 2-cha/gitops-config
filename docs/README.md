@@ -121,6 +121,18 @@
 
 ### ArgoCD
 
+![](assets/argo.png)
+
+#### ~~short-version~~
+
+ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 설정합니다. 또한, `Application` CRD를 정의하여 배포 대상 매니페스트를
+지정합니다.
+
+`Application`의 `Source`로 명시된 매니페스트를 확인하며,
+`Destination`로 지정된 클러스터에서 해당 리소스를 모니터링합니다.
+
+두 상태의 차이가 관찰되면 **Sync** 작업을 진행하게 됩니다.
+
 **TODO**
 <!-- TODO: AWS 구조 넣을지 말지? -->
 
