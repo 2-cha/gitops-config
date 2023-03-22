@@ -140,14 +140,16 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 
 ### 기본 사용법
 
-`kubectl -k bootstrap/overlays/default` 
+```bash
+$ kubectl -k bootstrap/overlays/default
+```
 > 기본 구성을 진행합니다.
 > Tekton, ArgoCD 설치와 더불어 기본 CI/CD 파이프라인 워크플로가 구축됩니다.
 
 
-
+#### ArgoCD 마저 설정하기!
 ```bash
- kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+$ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 > ArgoCD Server는 기본적으로 `ClusterIP` 타입의 서비스로 구성되기 때문에,
 > ALB를 이용하기 위하여 `NodePort` 타입으로 수정합니다. 
@@ -173,95 +175,146 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 > ArgoCD Server를 `insecure` 모드로 설정해야 HTTP를 이용할 수 있습니다.
 > ArgoCD CLI는 gRPC를 이용하기 때문에, HTTPS 설정이 필요합니다.
 ```bash
-kubectl patch deploy -n argocd argocd-server --type json -p '[ { "op": "add", "path": "/spec/template/spec/containers/0/command/-", "value": "--insecure" } ]'
+$ kubectl patch deploy -n argocd argocd-server --type json -p '[ { "op": "add", "path": "/spec/template/spec/containers/0/command/-", "value": "--insecure" } ]'
 ```
 
 이제 Web UI로 ArgoCD에 접근할 수 있습니다!
 
-### Tekton 트리거 설정하기
+
+### 새로운 애플리케이션 추가하기
+
+#### 1. 트리거 및 이벤트리스너 구성 
 
 
-`MODULE_PATH`는 
+Tekton 트리거에서 `MODULE_PATH`는 
 1. 웹훅 페이로드에 명시된 변경된 파일 경로
 2. GitOps 레포지토리 `apps/` 하위의 매니페스트 경로
 를 나타냅니다. (두 항목의 이름이 일치해야 합니다.)
 
+현재 배포 대상은 스프링 부트 애플리케이션뿐이기 때문에,  
+기존 스프링 빌드 파이프라인을 재사용하기 위해,  
+트리거의 `MODULE_PATH`만 **Parameterize** 하는 방식으로 진행됩니다.
+
+소스 레포지토리에 `user-service` 애플리케이션이 추가된 시나리오를 가정하겠습니다.  
+기본 트리거를 템플릿처럼 사용하기 위해 [kustomize]()를 사용합니다.
+
 
 ```yaml
-# trigger.yaml
-apiVersion: triggers.tekton.dev/v1beta1
-kind: Trigger
-metadata:
-  name: trigger # Kustomize here
-  namespace: tektonci
-...
-        - key: "MODULE_PATH"
-          expression: "string('backend/dummy')" # Kustomize here
-```
-> 템플릿이 되는 기본 트리거
-> 템플릿이 되는 트리거는 `backend/dummy`를 `MODULE_PATH` 로 두고 있습니다.
+# components/tektonci/triggers/overlays/user/kustomization.yaml
 
-  
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tektonci
+resources:
+  - ../../base
+
+patches:
+  - target:
+      group: triggers.tekton.dev
+      version: v1beta1
+      kind: Trigger
+      name: trigger 
+
+    patch: |
+      - op: replace
+        path: /metadata/name
+        value: "user-trigger" # 1
+      - op: replace
+        path: /spec/interceptors/0/params/0/value/0/expression
+        value: "string('backend/user')" # 2
+```
+> 단순히 기본 트리거의 `1) name`, `2) MODULE_PATH`만 변경하는 패치입니다.
+
 ```yaml
-# webhook-listener.yaml
-apiVersion: triggers.tekton.dev/v1beta1
-kind: EventListener
-metadata:
-  name: webhook-listener
-...
-  triggers:
-    - triggerRef: trigger
-    # Add new triggers
+# components/tektonci/triggers/overlays/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tektonci
+resources:
+  - demo
+  - user   # Add new Trigger 
 ```
-> 기본 웹훅 리스너
-> 웹훅 리스너의 기본 설정은 상기 dummy trigger만 참조합니다.
+> 모든 트리거를 한번에 배포하기 위해, overlays 디렉토리에서 `user` 디렉토리를 추가해줍니다.
 
-클러스터를 `bootstrap/ovelays/default`로 구성했다면,
-`MODULE_PATH` 가 `backend/demo`인 **demo-trigger** 가 배포되어 있습니다.
-하지만 아직 <ins>웹훅 리스너에 의해 참조되지 않으므로</ins>, 추가해주어야 합니다.
+[`demo-trigger`가 `webhook-listener`에 추가된 방식](#)처럼,  
+`user-trigger`를 추가하도록 패치 파일도 편집합니다.
+
+```json
+[
+  {
+    "op": "add",
+    "path": "/spec/triggers/-",
+    "value": {
+      "triggerRef": "demo-trigger"
+    }
+  },
+    {
+    "op": "add",
+    "path": "/spec/triggers/-",
+    "value": {
+      "triggerRef": "user-trigger"
+    }
+  }
+]
+```
+> `components/tektonci/listeners/listener-patch.json`
 
 
-미리 작성된 `listener-patch.json` 을 적용하여 트리거를 리스너에 추가합니다.
 ```bash
-kubectl patch el webhook-listener -n tektonci --type "json" --patch-file <listener-path>/listener-patch.json
+$ kubectl apply -k components/tektonci/listeners
+$ describe el -n tektonci | grep "Trigger Ref" 
+>    Trigger Ref:  trigger
+>    Trigger Ref:  demo-trigger
+>    Trigger Ref:  user-trigger
+```
+> 이제 `webhook-listener`는
+> `backend/dummy`, `backend/demo`, `backend/user` 에 대한 트리거를 참조하게 됩니다!
+
+
+#### 2. 매니페스트 및 ArgoCD Application 구성
+
+새로운 `user-trigger`는 `MODULE_PATH`를 CI/CD 파이프라인에게 파라미터로 넘깁니다.
+파이프라인의 마지막은 현재 GitOps 레포지토리의 매니페스트를 업데이트하는 단계입니다.
+
+업데이트할 `backend/user`의 매니페스트가 현재 레포지토리에 존재하지 않습니다.
+`apps/backend/demo` 디렉토리를 참조하여,  
+`user-service`의 `Deployment`, `Service` 등 매니페스트를 작성해주어야 합니다.  
+  
+<br></br>
+이제 마지막 단계입니다.  
+ArgoCD는 아직 새로 구성된 `user-service` 매니페스트에 대해 알지 못합니다.  
+`Application` 리소스를 작성하여, ArgoCD가 이를 모니터링하도록 합니다.
+
+```yaml
+# components/argocd/appsets/user-appset.yaml
+...
+      project: default
+      source:
+        repoURL: git@github.com:2-cha/gitops-config.git
+        targetRevision: main
+        path: apps/backend/user/overlays/{{env}} # Here
+...
+```
+> `demo-appset.yaml`을 참고하여 나머지 부분도 적절하게 변경해줍니다.
+
+```yaml
+# components/argocd/appsets/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd
+resources:
+  - demo-appset.yaml
+  - user-appset.yaml
+```
+> 한 번에 관리할 수 있도록 리소스를 추가합니다.
+
+```bash
+$ kubectl apply -k components/argocd/appsets
 ```
 
-이제 웹훅 리스너는 `backend/dummy`, `backend/demo`에 대한 트리거를 참조합니다!
-
-#### 새로운 `MODULE_PATH` 추가하기
-
-위 `demo` 트리거는 기본 트리거에 대한 오버레이로 생성되었습니다.
-````
-
+이제 ArgoCD 는 `apps/backend/user/...` 의 매니페스트를 쿠버네티스 클러스터와 레포지토리 상에서 모니터링합니다!
 
 
-
-
-
-
-
-**TODO**
-
-### 새 배포 대상 추가하기
-
-#### overlay `Trigger`
-
-    Spring Boot 앱이라면 `Trigger`의 MODULE_PATH만 패치하고, Pipeline 재사용
-    혹은 새로운 Pipeline도 함께 추가
-
-#### patch `EventListener`
-
-    `EventListener`에 새 `Trigger` 추가
-
-#### apps/<MODULE_PATH> 에 `Deploy`, `Service` 추가
-
-    source repository와 일치
-
-#### Application(Set) 추가
-
-## Examples
-
-**TODO**
 
 # TODO
 
