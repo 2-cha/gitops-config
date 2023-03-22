@@ -196,7 +196,7 @@ Tekton 트리거에서 `MODULE_PATH`는
 트리거의 `MODULE_PATH`만 **Parameterize** 하는 방식으로 진행됩니다.
 
 소스 레포지토리에 `user-service` 애플리케이션이 추가된 시나리오를 가정하겠습니다.  
-기본 트리거를 템플릿처럼 사용하기 위해 [kustomize]()를 사용합니다.
+기본 트리거를 템플릿처럼 사용하기 위해 [kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)를 사용합니다.
 
 
 ```yaml
@@ -236,7 +236,7 @@ resources:
 ```
 > 모든 트리거를 한번에 배포하기 위해, overlays 디렉토리에서 `user` 디렉토리를 추가해줍니다.
 
-[`demo-trigger`가 `webhook-listener`에 추가된 방식](#)처럼,  
+[`demo-trigger`가 `webhook-listener`에 추가된 방식](listener-patch.md)처럼,  
 `user-trigger`를 추가하도록 패치 파일도 편집합니다.
 
 ```json
