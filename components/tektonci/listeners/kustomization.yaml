@@ -3,3 +3,10 @@ kind: Kustomization
 namespace: tektonci
 resources:
   - webhook-listener.yaml
+patches:
+  - target:
+      group: triggers.tekton.dev
+      version: v1beta1
+      kind: EventListener
+      name: webhook-listener
+    path: listener-patch.json

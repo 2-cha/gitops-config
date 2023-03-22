@@ -19,5 +19,4 @@ patches:
         path: /spec/interceptors/0/params/0/value/0/expression
         value: "string('backend/demo')"
   
-  # Add new Trigger to EventListener with:
-  # kubectl patch el webhook-listener -n tektonci --type "json" --patch-file listener-patch.json
+  # Add new Trigger to EventListener by edit listener-patch.json
