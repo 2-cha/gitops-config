@@ -319,6 +319,8 @@ $ kubectl apply -k components/argocd/appsets
 # TODO
 
 - [x] apply CI to main branch
+- [x] complete README
+    - [x] How to add new application
 - [ ] <ins>tekton GC</ins>
 - [ ] <ins>inject configurations</ins>
 - [ ] automate gradual promotion
@@ -326,6 +328,5 @@ $ kubectl apply -k components/argocd/appsets
 - [ ] deploy Elastic stack
 - [ ] apply unit test, sonarqube
 - [ ] apply autoscaling
-- [ ] complete README
-    - [ ] How to add new application
-    - else?
+
+
