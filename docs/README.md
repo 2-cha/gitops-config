@@ -136,7 +136,109 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 **TODO**
 <!-- TODO: AWS 구조 넣을지 말지? -->
 
-## How to use?
+## Usage?
+
+### 기본 사용법
+
+`kubectl -k bootstrap/overlays/default` 
+> 기본 구성을 진행합니다.
+> Tekton, ArgoCD 설치와 더불어 기본 CI/CD 파이프라인 워크플로가 구축됩니다.
+
+
+
+```bash
+ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+```
+> ArgoCD Server는 기본적으로 `ClusterIP` 타입의 서비스로 구성되기 때문에,
+> ALB를 이용하기 위하여 `NodePort` 타입으로 수정합니다. 
+
+```yaml
+# argocd-ingress.yaml
+...
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+...
+  name: argocd
+  namespace: argocd
+
+...
+          backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 80
+```
+> 기본적으로 HTTP를 이용하도록 `Ingress`가 구성되어 있습니다.
+> tls를 적용하고 backend 포트를 443으로 설정하는 것이 권장됩니다.
+> **Note** 
+> ArgoCD Server를 `insecure` 모드로 설정해야 HTTP를 이용할 수 있습니다.
+> ArgoCD CLI는 gRPC를 이용하기 때문에, HTTPS 설정이 필요합니다.
+```bash
+kubectl patch deploy -n argocd argocd-server --type json -p '[ { "op": "add", "path": "/spec/template/spec/containers/0/command/-", "value": "--insecure" } ]'
+```
+
+이제 Web UI로 ArgoCD에 접근할 수 있습니다!
+
+### Tekton 트리거 설정하기
+
+
+`MODULE_PATH`는 
+1. 웹훅 페이로드에 명시된 변경된 파일 경로
+2. GitOps 레포지토리 `apps/` 하위의 매니페스트 경로
+를 나타냅니다. (두 항목의 이름이 일치해야 합니다.)
+
+
+```yaml
+# trigger.yaml
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: trigger # Kustomize here
+  namespace: tektonci
+...
+        - key: "MODULE_PATH"
+          expression: "string('backend/dummy')" # Kustomize here
+```
+> 템플릿이 되는 기본 트리거
+> 템플릿이 되는 트리거는 `backend/dummy`를 `MODULE_PATH` 로 두고 있습니다.
+
+  
+```yaml
+# webhook-listener.yaml
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: webhook-listener
+...
+  triggers:
+    - triggerRef: trigger
+    # Add new triggers
+```
+> 기본 웹훅 리스너
+> 웹훅 리스너의 기본 설정은 상기 dummy trigger만 참조합니다.
+
+클러스터를 `bootstrap/ovelays/default`로 구성했다면,
+`MODULE_PATH` 가 `backend/demo`인 **demo-trigger** 가 배포되어 있습니다.
+하지만 아직 <ins>웹훅 리스너에 의해 참조되지 않으므로</ins>, 추가해주어야 합니다.
+
+
+미리 작성된 `listener-patch.json` 을 적용하여 트리거를 리스너에 추가합니다.
+```bash
+kubectl patch el webhook-listener -n tektonci --type "json" --patch-file <listener-path>/listener-patch.json
+```
+
+이제 웹훅 리스너는 `backend/dummy`, `backend/demo`에 대한 트리거를 참조합니다!
+
+#### 새로운 `MODULE_PATH` 추가하기
+
+위 `demo` 트리거는 기본 트리거에 대한 오버레이로 생성되었습니다.
+````
+
+
+
+
+
+
+
 
 **TODO**
 
