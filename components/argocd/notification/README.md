@@ -40,3 +40,5 @@ metadata:
     notifications.argoproj.io/subscribe.on-deployed.slack: <channel_name>
     notifications.argoproj.io/subscribe.on-health-degraded.slack: <channel_name>
 ```
+
+> To override ArgoCD url on notification, see: https://github.com/argoproj-labs/argocd-notifications/issues/139
