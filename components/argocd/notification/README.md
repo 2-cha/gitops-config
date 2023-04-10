@@ -9,10 +9,14 @@ stringData:
 ...
 ```
 3. configure `argocd-notifications-cm` to use token:
-```yaml
+```bash
 # kubectl patch cm argocd-notifications-cm -n argocd --type merge -p '{"data": {"service.slack": "{ token: $slack-token }" }}'
-
-
+```
+or edit directly with
+```bash
+# kubectl edit cm -n argocd argocd-notifications-cm
+```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
