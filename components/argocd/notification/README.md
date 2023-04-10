@@ -42,3 +42,4 @@ metadata:
 ```
 
 > To override ArgoCD url on notification, see: https://github.com/argoproj-labs/argocd-notifications/issues/139
+> To customize bot icon, see: https://github.com/argoproj-labs/argocd-notifications/issues/71
