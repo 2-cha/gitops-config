@@ -59,7 +59,7 @@ spec:
           - name: build-context
             value: ./$(tt.params.module-path)
           - name: builder-image
-            value: gcr.io/kaniko-project/executor:latest
+            value: gcr.io/kaniko-project/executor:v1.9.1
           - name: dockerfile
             value: $(params.build-context)/Dockerfile
 
