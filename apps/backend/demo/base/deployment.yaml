@@ -6,7 +6,7 @@ metadata:
     revision: main-c0e74fbc14515f9d06c86ba317e8187172574cc3
 spec:
   # ReplicaSet 정의
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: demo-service
