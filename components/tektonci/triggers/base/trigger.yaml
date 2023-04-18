@@ -12,6 +12,7 @@ spec:
     # inject Parameter
     - ref:
         name: cel
+        kind: ClusterInterceptor
       params:
         - name: "overlays"
           value:
@@ -22,6 +23,7 @@ spec:
 
     - ref:
         name: cel
+        kind: ClusterInterceptor
       params:
         # filter changed files
         - name: "filter"
