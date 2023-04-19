@@ -1,9 +1,13 @@
+# TODO: set tls
+
 # Before expose to ALB, run:
 # kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 # Recommend: enable tls, set your backend port to 443
 # else: add --insecure flag to argocd-server deploy (spec.containers.command)
 
-# TODO: set tls
+# add these lines to your argocd-cmd-params-cm to use subpath:
+#   server.basehref: /argo
+#   server.rootpath: /argo
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -12,7 +16,7 @@ metadata:
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/load-balancer-name: argocd-alb
+    alb.ingress.kubernetes.io/group.name: integrated
   name: argocd
   namespace: argocd
 spec:
@@ -20,7 +24,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /argo
             backend:
               service:
                 name: argocd-server

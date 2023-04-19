@@ -7,8 +7,9 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/tags: tier=backend
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/load-balancer-name: backend-alb
-
+    alb.ingress.kubernetes.io/load-balancer-name: 2-cha
+    alb.ingress.kubernetes.io/group.name: integrated
+    alb.ingress.kubernetes.io/group.order: '3'
 spec:
   ingressClassName: alb
   rules:
