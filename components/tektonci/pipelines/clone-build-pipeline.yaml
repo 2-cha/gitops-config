@@ -14,6 +14,8 @@ spec:
     - name: build-context
     - name: builder-image
     - name: dockerfile
+    - name: extra-args
+      type: array
 
     # fetch-gitops
     - name: gitops-repo-url
@@ -74,6 +76,8 @@ spec:
           value: $(params.builder-image)
         - name: DOCKERFILE
           value: $(params.dockerfile)
+        - name: EXTRA_ARGS
+          value: ["$(params.extra-args[*])"]
 
 
     - name: fetch-gitops

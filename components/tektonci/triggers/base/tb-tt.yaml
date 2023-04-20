@@ -62,6 +62,10 @@ spec:
             value: gcr.io/kaniko-project/executor:v1.9.1
           - name: dockerfile
             value: $(params.build-context)/Dockerfile
+          - name: extra-args
+            value:
+              - --use-new-run
+              - --ignore-path=/root/.gradle
 
           # fetch-gitops
           - name: gitops-repo-url
