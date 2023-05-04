@@ -28,13 +28,24 @@ spec:
         # filter changed files
         - name: "filter"
           value: |-
-            body.commits.exists(
-              commit,
-              commit.added.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
-              commit.modified.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
-              commit.removed.exists(e, e.startsWith(extensions.MODULE_PATH))
-            ) && 
-            body.ref.split('/')[2] == 'main'
+            (
+              body.ref.split('/')[2] == 'main' ||
+              body.base_ref.split('/')[2] == 'main' 
+            )
+            &&
+            (
+              body.commits.exists(
+                commit,
+                commit.added.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+                commit.modified.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+                commit.removed.exists(e, e.startsWith(extensions.MODULE_PATH))
+              ) 
+              || 
+              body.head_commit.added.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+              body.head_commit.modified.exists(e, e.startsWith(extensions.MODULE_PATH)) ||
+              body.head_commit.removed.exists(e, e.startsWith(extensions.MODULE_PATH))
+            )
+
 
         # pass to TriggerBinding
         - name: "overlays"
