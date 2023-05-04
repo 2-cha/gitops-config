@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: tektonci
 resources:
   - webhook-listener-ingress.yaml
-  - tekton-dashboard-ingress.yaml
+# - tekton-dashboard-ingress.yaml
