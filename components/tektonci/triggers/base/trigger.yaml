@@ -20,6 +20,8 @@ spec:
               expression: "string('backend/dummy')" # Kustomize here
             - key: "MANIFEST_FILE"
               expression: "string('base/deployment.yaml')"  # Kustomize here
+            - key: "SOURCE_REPO_REVISION"
+              expression: "string('main')"  # Kustomize here
 
     - ref:
         name: cel
@@ -51,7 +53,8 @@ spec:
         - name: "overlays"
           value:
             - key: source-repo-revision
-              expression: "body.ref.split('/')[2]"
+              # expression: "body.ref.split('/')[2]"
+              expression: 'extensions.SOURCE_REPO_REVISION'
             - key: head-commit-url
               expression: "body.head_commit.url"
             - key: committer-name
