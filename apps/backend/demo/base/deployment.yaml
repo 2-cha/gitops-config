@@ -19,7 +19,7 @@ spec:
         app: demo-service
         tier: backend
     spec:
-      serviceAccount: ssm-readonly
+      serviceAccount: ssm-read-s3-full
       containers:
         - name: spring-boot
           image: m1nq/my-first-app:main-c73c00c7b3d93830d420b89dbd7644b1154cccfc
