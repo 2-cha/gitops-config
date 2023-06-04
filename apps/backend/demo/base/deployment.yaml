@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: demo-service
   annotations:
-    revision: main-b09bee32046a1c59bf38aa81a24f2ecc3dec7147
+    revision: main-3a5d2754bd1a1fc160e7af6d91fdd5633bf98ec3
 spec:
   # ReplicaSet 정의
   replicas: 2
@@ -22,7 +22,7 @@ spec:
       serviceAccount: ssm-read-s3-full
       containers:
         - name: spring-boot
-          image: m1nq/my-first-app:main-b09bee32046a1c59bf38aa81a24f2ecc3dec7147
+          image: m1nq/my-first-app:main-3a5d2754bd1a1fc160e7af6d91fdd5633bf98ec3
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
