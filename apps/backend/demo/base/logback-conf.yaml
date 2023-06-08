@@ -5,7 +5,7 @@ metadata:
 data:
   logback-included.xml: |+
     <included>
-      <root level="INFO">
+      <root level="OFF">
         <appender-ref ref="CONSOLE"/>
       </root>
     </included>
