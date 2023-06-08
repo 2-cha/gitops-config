@@ -20,6 +20,10 @@ spec:
         tier: backend
     spec:
       serviceAccount: ssm-read-s3-full
+      volumes:
+        - name: logback-conf-volume
+          configMap:
+            name: logback-conf
       containers:
         - name: spring-boot
           image: m1nq/my-first-app:main-7e38fd89e982db2d5c23631a005cecf777ee46d3
@@ -27,5 +31,8 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
+          volumeMounts:
+            - mountPath: /logback/config
+              name: logback-conf-volume
       imagePullSecrets:
         - name: image-pull-credentials

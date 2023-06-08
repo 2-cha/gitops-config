@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logback-conf
+data:
+  logback-included.xml: |+
+    <included>
+      <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+      </root>
+    </included>
