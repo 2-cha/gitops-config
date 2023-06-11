@@ -9,4 +9,7 @@ data:
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="LOGSTASH"/>
       </root>
+      <logger name="ReviewTagsLogger" level="INFO" additivity="false">
+        <appender-ref ref="LOGSTASH"/>
+      </logger> 
     </included>
