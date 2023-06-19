@@ -1,0 +1,20 @@
+# headless Service for StatefulSet
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: elastic
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  clusterIP: None
+  ports:
+  - name: rest
+    port: 9200
+    targetPort: rest
+  - name: transport
+    port: 9300
+    targetPort: transport
+  selector:
+    app: elasticsearch
+

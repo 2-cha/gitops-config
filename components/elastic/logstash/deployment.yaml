@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: elastic 
+  name: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: docker.elastic.co/logstash/logstash-oss:7.10.2 
+        args:
+          - --config.reload.automatic
+        ports:
+        - name: tcp
+          containerPort: 5000
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: logstash-pipeline
+          mountPath: /usr/share/logstash/pipeline
+        - name: index-templates
+          mountPath: /usr/share/logstash/index-templates
+      volumes:
+      - name: logstash-pipeline
+        configMap:
+          name: logstash-conf
+      - name: index-templates
+        configMap:
+          name: index-templates

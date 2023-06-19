@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: elastic
+  name: kibana-conf
+data:
+  kibana.yml: |
+    elasticsearch.hosts: [ "http://elasticsearch-0.elasticsearch.elastic.svc.cluster.local:9200" ]
+    server.name: kibana
+    server.host: "0.0.0.0"
+    server.basePath: "/kibana"
+    server.rewriteBasePath: true

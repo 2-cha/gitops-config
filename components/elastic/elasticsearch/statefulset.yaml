@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: elastic
+  name: elasticsearch 
+  labels:
+    app: elasticsearch
+spec:
+  serviceName: elasticsearch 
+  selector:
+    matchLabels:
+      app: elasticsearch 
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch 
+    spec:
+      volumes:
+      - name: elasticsearch-conf
+        configMap: 
+          name: elasticsearch-conf
+      initContainers:
+      - name: busybox
+        image: busybox:1.28
+        command: ['sh', '-c', "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        volumeMounts:
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+      containers:
+      - name: elasticsearch 
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2 
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: "ES_JAVA_OPTS"
+          value: "-Xms256m -Xmx256m" # due to OOM (exit: 137)
+        ports:
+        - name: rest 
+          containerPort: 9200
+        - name: transport
+          containerPort: 9300
+        volumeMounts:
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+        - name: elasticsearch-conf
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          readOnly: true
+          subPath: elasticsearch.yml
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticsearch-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
