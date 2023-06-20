@@ -34,5 +34,13 @@ spec:
           volumeMounts:
             - mountPath: /logback/config
               name: logback-conf-volume
+          readinessProbe:
+            periodSeconds: 15
+            timeoutSeconds: 2
+            successThreshold: 2
+            failureThreshold: 2
+            httpGet:
+              path: /
+              port: 8080
       imagePullSecrets:
         - name: image-pull-credentials
