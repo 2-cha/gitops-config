@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: demo-service
   annotations:
-    revision: main-11e2d1bc9882aec3f99580ed7510098f686c7c8f
+    revision: main-d98df734ed2d7f898ef9a330ca622e26497fbc61
 spec:
   # ReplicaSet 정의
   replicas: 2
@@ -26,7 +26,7 @@ spec:
             name: logback-conf
       containers:
         - name: spring-boot
-          image: m1nq/my-first-app:main-11e2d1bc9882aec3f99580ed7510098f686c7c8f
+          image: m1nq/my-first-app:main-d98df734ed2d7f898ef9a330ca622e26497fbc61
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
