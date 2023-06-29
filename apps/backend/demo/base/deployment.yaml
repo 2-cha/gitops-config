@@ -34,6 +34,9 @@ spec:
           volumeMounts:
             - mountPath: /logback/config
               name: logback-conf-volume
+          envFrom:
+            - configMapRef:
+                name: hibernate-search-conf
           readinessProbe:
             periodSeconds: 15
             timeoutSeconds: 2
