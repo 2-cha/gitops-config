@@ -4,4 +4,3 @@ namespace: argocd
 resources:
   - secrets
   - ingresses
-  - appsets
