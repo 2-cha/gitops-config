@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: redis
-  name: redis-conf
-data:
-  redis-config:  |
-    maxmemory 20mb
-    maxmemory-policy allkeys-lru

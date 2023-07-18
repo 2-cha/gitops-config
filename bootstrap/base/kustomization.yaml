@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - argocd
   - tektonci
-  - redis
   - elastic
