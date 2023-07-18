@@ -8,3 +8,4 @@ config
 *.crt
 *.pem
 *.key
+.htpasswd

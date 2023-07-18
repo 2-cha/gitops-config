@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: elastic
+  name: nginx-kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-kibana
+  template:
+    metadata:
+      labels:
+        app: nginx-kibana
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - name: http
+          containerPort: 80
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: nginx-conf
+          mountPath: /etc/nginx/.htpasswd
+          subPath: .htpasswd
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
