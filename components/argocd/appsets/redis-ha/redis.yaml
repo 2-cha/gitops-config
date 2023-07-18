@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: redis
+    targetRevision: '17.13.2'
+    helm:
+      parameters:
+        - name: image.debug
+          value: 'true'
+        # common
+        - name: auth.enabled
+          value: 'false'
+        - name: auth.sentinel
+          value: 'false'
+        # image
+        - name: image.debug
+          value: 'true'
+        # replication
+        - name: master.count
+          value: '1'
+        - name: replica.replicaCount
+          value: '3'
+        # sentinel
+        - name: sentinel.enabled
+          value: 'true'
+        - name: sentinel.quorum
+          value: '2'
+
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false

@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: haproxy 
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: haproxy 
+    targetRevision: '0'
+    helm:
+      parameters:
+        - name: service.type
+          value: NodePort
+        - name: containerPorts[0].name
+          value: 'dashboard'
+        - name: containerPorts[0].containerPort
+          value: '8080'
+        - name: containerPorts[1].name
+          value: 'redis-read'
+        - name: containerPorts[1].containerPort
+          value: '6379'
+        - name: containerPorts[2].name
+          value: 'redis-write'
+        - name: containerPorts[2].containerPort
+          value: '6380'
+        - name: service.ports[0].name
+          value: 'dashboard'
+        - name: service.ports[0].targetPort
+          value: 'dashboard'
+        - name: service.ports[0].port
+          value: '8080'
+        - name: service.ports[1].name
+          value: 'redis-read'
+        - name: service.ports[1].targetPort
+          value: 'redis-read'
+        - name: service.ports[1].port
+          value: '6379'
+        - name: service.ports[2].name
+          value: 'redis-write'
+        - name: service.ports[2].targetPort
+          value: 'redis-write'
+        - name: service.ports[2].port
+          value: '6380'
+        - name: existingConfigmap
+          value: redis-haproxy-config
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
