@@ -3,12 +3,10 @@ kind: Application
 metadata:
   name: haproxy 
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: redis-ha
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
@@ -54,3 +52,4 @@ spec:
     automated:
       prune: false
       selfHeal: false
+

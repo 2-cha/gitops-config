@@ -3,12 +3,10 @@ kind: Application
 metadata:
   name: redis
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: redis-ha
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
@@ -36,7 +34,6 @@ spec:
           value: 'true'
         - name: sentinel.quorum
           value: '2'
-
   syncPolicy:
     automated:
       prune: false
