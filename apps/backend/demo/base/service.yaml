@@ -10,8 +10,19 @@ spec:
     - port: 80
       name: api
       targetPort: api
+  externalTrafficPolicy: Local
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service-ops
+spec:
+  selector:
+    app: demo-service
+    tier: backend
+  ports:
     - port: 9876
       name: ops
       targetPort: ops
-  externalTrafficPolicy: Local
-  type: NodePort
+  type: ClusterIP
