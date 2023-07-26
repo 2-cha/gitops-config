@@ -25,7 +25,14 @@ spec:
               service:
                 name: demo-service
                 port:
-                  number: 80
+                  name: api
+          - pathType: Prefix
+            path: /ops
+            backend:
+              service:
+                name: demo-service
+                port:
+                  name: ops
 #          - pathType: Prefix
 #            path: /user
 #            backend:

@@ -30,6 +30,10 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
+              name: api
+            - containerPort: 9876
+              protocol: TCP
+              name: ops
           volumeMounts:
             - mountPath: /logback/config
               name: logback-conf-volume

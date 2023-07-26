@@ -8,6 +8,10 @@ spec:
     tier: backend
   ports:
     - port: 80
-      targetPort: 8080 # containerPort
+      name: api
+      targetPort: api
+    - port: 9876
+      name: ops
+      targetPort: ops
   externalTrafficPolicy: Local
   type: NodePort
