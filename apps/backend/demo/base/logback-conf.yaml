@@ -11,5 +11,8 @@ data:
       </root>
       <logger name="ReviewTagsLogger" level="INFO" additivity="false">
         <appender-ref ref="LOGSTASH"/>
-      </logger> 
+      </logger>
+      <logger name="httpLogger" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+      </logger>
     </included>
