@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: demo-service 
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 7
 # targetCPUUtilizationPercentage: 50
   metrics:
     - type: Resource
