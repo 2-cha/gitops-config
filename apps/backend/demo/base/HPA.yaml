@@ -9,6 +9,9 @@ spec:
     name: demo-service 
   minReplicas: 2
   maxReplicas: 7
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 120
 # targetCPUUtilizationPercentage: 50
   metrics:
     - type: Resource
