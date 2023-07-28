@@ -14,9 +14,10 @@ spec:
       stabilizationWindowSeconds: 120
 # targetCPUUtilizationPercentage: 50
   metrics:
-    - type: Resource
-      resource:
-        name: cpu
+    - type: Pods
+      pods:
+        metric:
+          name: http_server_requests_per_second
         target:
-          type: Utilization
-          averageUtilization: 70
+          type: AverageValue
+          averageValue: "3"
