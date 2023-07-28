@@ -25,4 +25,4 @@ spec:
     - port: 9876
       name: ops
       targetPort: ops
-  type: NodePort # XXX: for testing reachability to pod from outside of cluster
+  type: ClusterIP
