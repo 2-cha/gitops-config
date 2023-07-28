@@ -10,7 +10,6 @@ spec:
     - port: 80
       name: api
       targetPort: api
-#  externalTrafficPolicy: Local
   type: NodePort
 ---
 apiVersion: v1
