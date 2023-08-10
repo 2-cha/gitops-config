@@ -321,12 +321,12 @@ $ kubectl apply -k components/argocd/appsets
 - [x] apply CI to main branch
 - [x] complete README
     - [x] How to add new application
+- [x] apply autoscaling
+- [x] deploy prometheus, grafana
+- [x] deploy Elastic stack
 - [ ] <ins>tekton GC</ins>
 - [ ] <ins>inject configurations</ins>
 - [ ] automate gradual promotion
-- [ ] deploy prometheus, grafana
-- [ ] deploy Elastic stack
 - [ ] apply unit test, sonarqube
-- [ ] apply autoscaling
 
 
