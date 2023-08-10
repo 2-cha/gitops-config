@@ -11,7 +11,9 @@ data:
         codec => json_lines
       }
     }
+    
     filter {
+      # placesQuery
       if [message] =~ /\[GET\]\[\/places\/nearby\]/ {
         clone {
           clones => [ "placesQuery" ]
@@ -22,22 +24,42 @@ data:
           match => { "message" => "\[GET\]\[\/places\/nearby\] lat=\"\[%{NUMBER:lat}\]\" lon=\"\[%{NUMBER:lon}\]\"" }
         }
         mutate {
-          #convert => { "lat" => "float" }
-          #convert => { "lon" => "float" }
-          #copy => {
-          #  "lat" => "[location][lat]"
-          #  "lon" => "[location][lon]"
-          #}
           add_field => { "location" => "%{lat},%{lon}" }
           remove_field => [ "lat", "lon" ]
         }
       }
+    
+      # ReviewTagsLogger
       if [logger_name] == "ReviewTagsLogger" {
         mutate {
           remove_field => [ "host", "level", "level_value", "message", "port", "thread_name" ] 
         }
       }
+    
+      # Collection Listing
+      if [message] =~ /^\[Collection Listing\]/ {
+        clone {
+          clones => [ "collectionListing" ]
+        }
+        if [type] == "collectionListing" {
+          grok {
+            match => { "message" => "\[Collection Listing\] Member <%{NUMBER:member_id}>, Recommended: %{NUMBER:recommended}, Nearby: %{NUMBER:nearby}, Latest: %{NUMBER:latest}" }
+          }
+          mutate {
+            add_field => { 
+              "member_id" => "%{memberId}"
+              "recommended" => "%{recommended}"
+              "nearby" => "%{nearby}"
+              "latest" => "%{latest}"
+            }
+          }
+          mutate {
+            remove_field => [ "host", "level", "level_value", "message", "port", "thread_name" ] 
+          }
+        }
+      }
     }
+    
     output {
       if [type] == "placesQuery" {
         elasticsearch {
@@ -46,6 +68,12 @@ data:
           manage_template => true
           template_name => "places-query-location"
           template => "/usr/share/logstash/index-templates/places-query-location.json"
+        }
+      }
+      else if [type] == "collectionListing" {
+        elasticsearch {
+          hosts => ["elasticsearch-0.elasticsearch.elastic.svc.cluster.local:9200"]
+          index => "collection-listing-%{+YYYY.MM.dd}"
         }
       }
       else if [logger_name] == "ReviewTagsLogger" {
@@ -61,4 +89,4 @@ data:
         }
       }
     }
-
+    
