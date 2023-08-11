@@ -41,21 +41,13 @@ data:
         clone {
           clones => [ "collectionListing" ]
         }
-        if [type] == "collectionListing" {
-          grok {
-            match => { "message" => "\[Collection Listing\] Member <%{NUMBER:member_id}>, Recommended: %{NUMBER:recommended}, Nearby: %{NUMBER:nearby}, Latest: %{NUMBER:latest}" }
-          }
-          mutate {
-            add_field => { 
-              "member_id" => "%{memberId}"
-              "recommended" => "%{recommended}"
-              "nearby" => "%{nearby}"
-              "latest" => "%{latest}"
-            }
-          }
-          mutate {
-            remove_field => [ "host", "level", "level_value", "message", "port", "thread_name" ] 
-          }
+      }
+      if [type] == "collectionListing" {
+        grok {
+          match => { "message" => "\[Collection Listing\] Member <%{WORD:member_id}>, Recommended: %{NUMBER:recommended:int}, Nearby: %{NUMBER:nearby:int}, Latest: %{NUMBER:latest:int}" }
+        }
+        mutate {
+          remove_field => [ "host", "level", "level_value", "message", "port", "thread_name" ] 
         }
       }
     }
