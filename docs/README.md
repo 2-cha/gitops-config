@@ -1,11 +1,8 @@
-# GitOps using Tekton and Argo
----
-
-![](assets/cicd.png)
+# GitOps with ArgoCD
 
 ## Requirements
 
-- Kubernetes Cluster: Tekton과 ArgoCD가 배포될 클러스터가 필요합니다. 현재 kOps로 EC2에 배포되어 있습니다.
+- Kubernetes Cluster: ArgoCD가 배포될 클러스터가 필요합니다. 현재 kOps로 EC2에 배포되어 있습니다.
 - [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller):
   Ingress 리소스를 ALB로 제공하기 위해 필요합니다. kOps의 add-on으로 설치되어 있습니다.
 
@@ -99,13 +96,31 @@
 | components | GitOps 컨트롤러의 구성 요소가 있는 곳입니다.<br />Tekton, ArgoCD의 구성이 이 곳에 들어갑니다.<br /><br />기본적으로 리소스 접근을 위한 `RBAC`, 레포지토리 접근을 위한 `Secret`, 각 컨트롤러를 노출하기 위한 `Ingress` 등이 포함될 수 있습니다.<br /><br />- `tektonci`: 상기 기본 구성 외에, CI 파이프라인 및 웹훅 트리거 등으로 구성되어 있습니다. <br />- `argocd`: 기본 구성 외에, `ApplicationSet`, `AppProject` 등이 포함됩니다. 현재 `demo-appset`이 기본으로 구성되어 있습니다. |
 | apps       | 배포 대상 워크로드가 있는 곳입니다.<br /><br />Tekton에 의해 deployment가 업데이트 되며,<br />ArgoCD에 의해 배포됩니다.<br />                                                                                                                                                                                                                                                        |
 
+---
+
+# CI/CD with Tekton + ArgoCD
 ## How does it work?
 
+![](assets/cicd.png)
+
+
+
+  
 ### Tekton
 
-![](assets/tekton.png)
-> **Note** 이해의 편의를 위해 그림 및 설명에 일부 생략된 요소가 있습니다.
+> Tekton은 Kubernetes 기반의 오픈소스 CI/CD 프레임워크입니다.  
+> 빌드 / 테스트 / 배포 등의 작업 파이프라인을 유연하게 구성할 수 있으며,  
+> 이 프로젝트에서는 CI 컴포넌트로 사용됩니다.
+&nbsp;&nbsp;
+&nbsp;&nbsp;
 
+![](assets/tekton.png)
+
+> [!NOTE]
+> 이해의 편의를 위해 그림 및 설명에 일부 생략된 요소가 있습니다.
+&nbsp;&nbsp;
+&nbsp;&nbsp;
+  
 레포지토리 구조상 `Webhook`을 **단일 엔드포인트**로 수신하고 있기 때문에, <ins>Path 기반 라우팅을 할 수 없습니다</ins>.  
 따라서 다음과 같은 프로세스를 거칩니다.
 
@@ -116,14 +131,22 @@
    일치하면 트리거가 동작합니다.
 4. `Trigger`는 미리 작성된 `Pipeline`에 파라미터를 넘겨주며 실행시킵니다.
 
+  
 현재는 빌드 및 배포 대상이 되는 경로만 다르고 빌드 과정이 모두 같기 때문에,  
 같은 `Pipeline`을 이용하며 **MODULE_PATH**만 파라미터로 넘겨 대상을 결정합니다.
 
 ### ArgoCD
 
+> ArgoCD는 Kubernetes 환경에서의 지속적 배포 및 관리 자동화를 위한 도구입니다.  
+> Kubernetes 클러스터 상에 배포될 애플리케이션의 매니페스트를 Git에서 선언적으로 관리하여,  
+> GitOps의 구현을 가능하게 합니다.
+&nbsp;&nbsp;
+&nbsp;&nbsp;
+
 ![](assets/argo.png)
 
-#### ~~short-version~~
+&nbsp;&nbsp;
+&nbsp;&nbsp;
 
 ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 설정합니다. 또한, `Application` CRD를 정의하여 배포 대상 매니페스트를
 지정합니다.
@@ -133,10 +156,7 @@ ArgoCD는 `Secret` 리소스를 이용하여 Repository에 대한 커넥션을 �
 
 두 상태의 차이가 관찰되면 **Sync** 작업을 진행하게 됩니다.
 
-**TODO**
-<!-- TODO: AWS 구조 넣을지 말지? -->
-
-## Usage?
+## Usage
 
 ### 기본 사용법
 
@@ -171,7 +191,8 @@ $ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 ```
 > 기본적으로 HTTP를 이용하도록 `Ingress`가 구성되어 있습니다.
 > tls를 적용하고 backend 포트를 443으로 설정하는 것이 권장됩니다.
-> **Note** 
+
+> [!NOTE]
 > ArgoCD Server를 `insecure` 모드로 설정해야 HTTP를 이용할 수 있습니다.
 > ArgoCD CLI는 gRPC를 이용하기 때문에, HTTPS 설정이 필요합니다.
 ```bash
@@ -181,24 +202,27 @@ $ kubectl patch deploy -n argocd argocd-server --type json -p '[ { "op": "add", 
 이제 Web UI로 ArgoCD에 접근할 수 있습니다!
 
 
-### 새로운 애플리케이션 추가하기
+### Mono Repo의 새로운 모듈을 추가하기
 
 #### 1. 트리거 및 이벤트리스너 구성 
 
 
-Tekton 트리거에서 `MODULE_PATH`는 
+Tekton 트리거에서 `MODULE_PATH`는,  
+
 1. 웹훅 페이로드에 명시된 변경된 파일 경로
 2. GitOps 레포지토리 `apps/` 하위의 매니페스트 경로
+
+
 를 나타냅니다. (두 항목의 이름이 일치해야 합니다.)
 
-현재 배포 대상은 스프링 부트 애플리케이션뿐이기 때문에,  
+현재 소스 레포지토리에서 배포 대상은 스프링 부트 애플리케이션뿐이기 때문에,  
 기존 스프링 빌드 파이프라인을 재사용하기 위해,  
-트리거의 `MODULE_PATH`만 **Parameterize** 하는 방식으로 진행됩니다.
-
+트리거의 `MODULE_PATH`만 **Parameterize** 하는 방식으로 진행됩니다.  
+  
 소스 레포지토리에 `user-service` 애플리케이션이 추가된 시나리오를 가정하겠습니다.  
 기본 트리거를 템플릿처럼 사용하기 위해 [kustomize](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/)를 사용합니다.
-
-
+  
+  
 ```yaml
 # components/tektonci/triggers/overlays/user/kustomization.yaml
 
@@ -314,7 +338,7 @@ $ kubectl apply -k components/argocd/appsets
 
 이제 ArgoCD 는 `apps/backend/user/...` 의 매니페스트를 쿠버네티스 클러스터와 레포지토리 상에서 모니터링합니다!
 
-
+---
 
 # TODO
 
