@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: taurus-config
+data:
+  taurus.yml: |-
+    execution:
+      - concurrency: 100
+        ramp-up: 1s
+        hold-for: 10m
+        scenario: quick-test
+    scenarios:
+      quick-test:
+        requests:
+          - http://demo-service.default.svc/

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: taurus
+spec:
+  containers:
+    - name: taurus
+      image: blazemeter/taurus
+      command: ["tail", "-f", "/dev/null"]
+      imagePullPolicy: Always
+      volumeMounts:
+        - mountPath: /bzt-configs
+          name: taurus-config-volume
+  volumes:
+    - name: taurus-config-volume
+      configMap:
+        name: taurus-config
