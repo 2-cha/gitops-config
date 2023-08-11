@@ -5,4 +5,4 @@ resources:
   - service.yaml
   - logback-conf.yaml
   - hibernate-search-conf.yaml
-#  - HPA.yaml
+  - HPA.yaml
