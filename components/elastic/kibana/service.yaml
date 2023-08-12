@@ -10,5 +10,5 @@ spec:
   ports:
     - port: 80
       targetPort: ui
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
 
