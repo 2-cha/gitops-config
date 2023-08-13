@@ -4,7 +4,7 @@ metadata:
   namespace: elastic
   name: kibana
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: kibana
   ports:
