@@ -21,9 +21,3 @@ spec:
         target:
           type: AverageValue
           averageValue: "500"
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 80
