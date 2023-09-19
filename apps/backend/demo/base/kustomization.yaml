@@ -6,3 +6,4 @@ resources:
   - logback-conf.yaml
   - hibernate-search-conf.yaml
   - HPA.yaml
+  - logstash-url.yaml

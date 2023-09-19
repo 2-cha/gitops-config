@@ -40,6 +40,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: hibernate-search-conf
+            - configMapRef:
+                name: logstash-url
           readinessProbe:
             periodSeconds: 5
             timeoutSeconds: 2
