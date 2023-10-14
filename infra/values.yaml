@@ -1,0 +1,14 @@
+# required
+clusterName: "where2go.k8s.local"
+awsRegion: "ap-northeast-2"
+stateBucketName: "where2go-kops-state"
+oidcBucketName: "where2go-kops-oidc"
+
+# optional
+#masterMachineType: "t2.micro"
+#masterMaxSize: 1
+#masterMinSize: 1
+#nodeMachineType: "t2.micro"
+#nodeMaxSize: 2
+#nodeMinSize: 0
+#natInstanceId: "i-0f0b2b2b2b2b2b2b2"

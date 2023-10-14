@@ -1,0 +1,146 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  name: {{.clusterName}}
+spec:
+  # addons
+  certManager:
+    enabled: true
+  podIdentityWebhook:
+    enabled: true
+  awsLoadBalancerController:
+    enabled: true
+  metricsServer:
+    enabled: true
+  # addons end
+  api:
+    loadBalancer:
+      class: Network
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://{{.stateBucketName}}/{{.clusterName}}
+  etcdClusters:
+  - cpuRequest: 200m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: control-plane-{{.awsRegion}}a
+      name: a
+    memoryRequest: 100Mi
+    name: main
+  - cpuRequest: 100m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: control-plane-{{.awsRegion}}a
+      name: a
+    memoryRequest: 100Mi
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+    useServiceAccountExternalPermissions: true
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  - ::/0
+  kubernetesVersion: 1.26.9
+  networkCIDR: 172.20.0.0/16
+  networking:
+    flannel:
+      backend: vxlan
+  nonMasqueradeCIDR: 100.64.0.0/10
+  serviceAccountIssuerDiscovery:
+    discoveryStore: s3://{{.oidcBucketName}}/{{.clusterName}}/discovery/{{.clusterName}}
+    enableAWSOIDCProvider: true
+  sshAccess:
+  - 0.0.0.0/0
+  - ::/0
+
+  subnets:
+  - cidr: 172.20.32.0/19
+    name: {{.awsRegion}}a
+    {{if .natInstanceId}}egress: {{.natInstanceId}} {{end}}
+    type: Private
+    zone: {{.awsRegion}}a
+  - cidr: 172.20.64.0/19
+    name: {{.awsRegion}}c
+    {{if .natInstanceId}}egress: {{.natInstanceId}} {{end}}
+    type: Private
+    zone: {{.awsRegion}}c
+  - cidr: 172.20.0.0/22
+    name: utility-{{.awsRegion}}a
+    type: Utility
+    zone: {{.awsRegion}}a
+  - cidr: 172.20.4.0/22
+    name: utility-{{.awsRegion}}c
+    type: Utility
+    zone: {{.awsRegion}}c
+  topology:
+    dns:
+      type: Private
+    masters: private
+    nodes: private
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{.clusterName}}
+  name: control-plane-{{.awsRegion}}a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230918
+  instanceMetadata:
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  machineType: {{or .masterMachineType "t3.medium"}}
+  maxSize: {{or .masterMaxSize "1"}}
+  minSize: {{or .masterMinSize "1"}}
+  role: Master
+  subnets:
+  - {{.awsRegion}}a
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{.clusterName}}
+  name: nodes-{{.awsRegion}}a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230918
+  instanceMetadata:
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  machineType: {{or .nodeMachineType "t3.medium"}}
+  maxSize: {{or .nodeMaxSize "2"}}
+  minSize: {{or .nodeMinSize "0"}}
+  role: Node
+  subnets:
+  - {{.awsRegion}}a
+
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  labels:
+    kops.k8s.io/cluster: {{.clusterName}}
+  name: nodes-{{.awsRegion}}c
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230918
+  instanceMetadata:
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  machineType: {{or .nodeMachineType "t3.medium"}}
+  maxSize: {{or .nodeMaxSize "2"}}
+  minSize: {{or .nodeMinSize "0"}}
+  role: Node
+  subnets:
+  - {{.awsRegion}}c
