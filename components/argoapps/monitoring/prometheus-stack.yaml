@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  project: default
+  sources:
+    # prometheus-operator / grafana
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 48.2.0
+      helm:
+        # https://github.com/argoproj/argo-cd/issues/11317
+        values: |-
+          prometheus:
+            prometheusSpec:
+              routePrefix: /prometheus
+              podMonitorSelectorNilUsesHelmValues: false
+              podMonitorSelector: {}
+              podMonitorNamespaceSelector: {}
+            additionalPodMonitors:
+              - name: spring-boot-podmonitor
+                jobLabel: spring-boot-podmonitor
+                selector:
+                  matchLabels:
+                    app: demo-service
+                namespaceSelector:
+                  matchNames:
+                    - default
+                podMetricsEndpoints:
+                  - port: ops
+                    path: /ops/prometheus
+          grafana: 
+            enabled: false
+
+    # prometheus-adapter
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: prometheus-adapter
+      targetRevision: 4.3.0
+      helm:
+        values: |-
+          prometheus:
+              url: http://prometheus-operated.monitoring.svc
+              port: 9090
+              path: /prometheus
+          rules:
+            custom:
+              - seriesQuery: '{__name__=~"^http_server_requests_seconds_count$", job="monitoring/spring-boot-podmonitor", uri=~"^/.*"}'
+                name:
+                  matches: "^(.*)_seconds_count$"
+                  as: "${1}_per_second"
+                resources:
+                  overrides:
+                    namespace: { resource: namespace }
+                    pod: { resource: pod }
+                metricsQuery: sum by (<<.GroupBy>>) (rate(<<.Series>>{<<.LabelMatchers>>}[5m]))
+
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
+    syncOptions: # https://github.com/prometheus-community/helm-charts/issues/1500
+        - Replace=True
+        - ServerSideApply=true # https://blog.ediri.io/kube-prometheus-stack-and-argocd-25-server-side-apply-to-the-rescue
+        - CreateNamespace=true
