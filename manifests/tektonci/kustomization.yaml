@@ -4,7 +4,7 @@ namespace: tektonci
 resources:
   - crd
   - namespace
-  - secrets
+#  - secrets
   - rbacs
   - listeners
   - ingresses
