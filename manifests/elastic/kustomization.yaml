@@ -6,4 +6,5 @@ resources:
   - elasticsearch
   - logstash
   - kibana
-  - nginx
+# enable nginx only if you want to expose kibana to the internet, with basic auth
+#  - nginx
