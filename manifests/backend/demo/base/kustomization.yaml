@@ -7,3 +7,4 @@ resources:
   - hibernate-search-conf.yaml
   - HPA.yaml
   - logstash-url.yaml
+  - backend-gateway.yaml

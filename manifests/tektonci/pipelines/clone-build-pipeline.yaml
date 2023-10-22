@@ -108,13 +108,13 @@ spec:
           workspace: my-workspace
           subPath: gitops
       params:
-        # TODO: prefix, for manifest file (apps/)
+        # TODO: prefix, for manifest file (manifests/)
         - name: SCRIPT
           value: |-
             yq e '
               with(.$(params.image-field) ; . = "$(tasks.build-push-image.results.IMAGE_URL)" | . style="") |
               with(.$(params.annotations-field).revision ; . = "$(params.source-repo-revision)-$(tasks.fetch-source.results.commit)" | . style="")
-            ' -i ./apps/$(params.module-path)/$(params.manifest-file)
+            ' -i ./manifests/$(params.module-path)/$(params.manifest-file)
 
     - name: push-to-gitops-repo
       runAfter: [ "update-manifest" ]

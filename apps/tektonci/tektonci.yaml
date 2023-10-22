@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: taurus
+  name: tektonci
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: git@github.com:2-cha/gitops-config.git
     targetRevision: main
-    path: manifests/bzt
+    path: manifests/tektonci
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: tektonci
   syncPolicy:
     automated:
       prune: true

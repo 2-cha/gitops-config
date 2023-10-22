@@ -27,7 +27,7 @@ spec:
       source:
         repoURL: git@github.com:2-cha/gitops-config.git
         targetRevision: main
-        path: apps/backend/demo/overlays/{{env}} #TODO: kustomize
+        path: manifests/backend/demo/overlays/{{env}} #TODO: kustomize
       destination:
         server: https://kubernetes.default.svc
         namespace: default

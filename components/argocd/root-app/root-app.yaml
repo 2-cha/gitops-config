@@ -1,17 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: taurus
+  name: root
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
   project: default
   source:
     repoURL: git@github.com:2-cha/gitops-config.git
     targetRevision: main
-    path: apps/bzt
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: default
+    path: apps/
   syncPolicy:
     automated:
       prune: true

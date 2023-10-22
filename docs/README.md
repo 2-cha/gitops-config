@@ -9,92 +9,51 @@
 ## Structure
 
 ```
+.
+.
 ├── apps
-│   └── backend
-│       └── demo
-│           ├── base
-│           │   ├── deployment.yaml
-│           │   ├── kustomization.yaml
-│           │   └── service.yaml
-│           └── overlays
-│               ├── dev
-│               │   └── kustomization.yaml
-│               ├── prod
-│               │   └── kustomization.yaml
-│               └── stage
-│                   └── kustomization.yaml
+│   ├── bzt
+│   ├── demo-service
+│   ├── elastic
+│   ├── kustomization.yaml
+│   ├── monitoring
+│   ├── redis-ha
+│   └── tektonci
 ├── bootstrap
 │   ├── base
-│   │   ├── argocd
-│   │   │   └── kustomization.yaml
-│   │   ├── kustomization.yaml
-│   │   └── tektonci
-│   │       ├── kustomization.yaml
-│   │       └── tektonci-ns.yaml
 │   └── overlays
-│       └── default
-│           └── kustomization.yaml
 ├── components
-│   ├── argocd
-│   │   ├── appsets
-│   │   │   ├── demo-appset.yaml
-│   │   │   └── kustomization.yaml
-│   │   ├── ingresses
-│   │   │   ├── argocd-ingress.yaml
-│   │   │   └── kustomization.yaml
-│   │   ├── kustomization.yaml
-│   │   └── secrets
-│   │       ├── config
-│   │       ├── config.json
-│   │       ├── id_rsa_gitops
-│   │       ├── id_rsa_source
-│   │       └── kustomization.yaml
-│   └── tektonci
-│       ├── ingresses
-│       │   ├── kustomization.yaml
-│       │   └── webhook-listener-ingress.yaml
-│       ├── kustomization.yaml
-│       ├── listeners
-│       │   ├── kustomization.yaml
-│       │   ├── listener-patch.json
-│       │   └── webhook-listener.yaml
-│       ├── pipelines
-│       │   ├── clone-build-pipeline.yaml
-│       │   └── kustomization.yaml
-│       ├── rbacs
-│       │   ├── kustomization.yaml
-│       │   └── tekton-robot.yaml
-│       ├── secrets
-│       │   ├── config
-│       │   ├── config.json
-│       │   ├── id_rsa_gitops
-│       │   ├── id_rsa_source
-│       │   └── kustomization.yaml
-│       └── triggers
-│           ├── base
-│           │   ├── kustomization.yaml
-│           │   ├── tb-tt.yaml
-│           │   └── trigger.yaml
-│           └── overlays
-│               ├── demo
-│               │   └── kustomization.yaml
-│               └── kustomization.yaml
-└── core
-    ├── ingresses
-    │   ├── backend-gateway.yaml
-    │   └── kustomization.yaml
-    ├── kustomization.yaml
-    └── secrets
-        ├── config.json
-        └── kustomization.yaml
+│   └── argocd
+├── core
+│   ├── kustomization.yaml
+│   └── secrets
+├── docs
+│   ├── README.md
+│   ├── assets
+│   └── listener-patch.md
+├── infra
+│   ├── README.md
+│   ├── cluster.tmpl.yaml
+│   ├── cluster.yaml
+│   ├── create-iam-role.sh
+│   ├── create-s3-buckets.sh
+│   └── values.yaml
+└── manifests
+    ├── backend
+    ├── bzt
+    ├── elastic
+    ├── redis-ha
+    └── tektonci
 ```
 
-| Directory  | Description                                                                                                                                                                                                                                                                                                                                         |
-|------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| bootstrap  | 클러스터 설정을 부트스트랩핑하는 항목입니다.<br />일반적으로 CRD 혹은 설치 매니페스트입니다. <br/><br />- `base` : 기본이 되는 설정입니다. ArgoCD, Tekton 매니페스트를 설치합니다.<br />- `overlays`: 클러스터 별 설정입니다.<br />현재 `overlays/default`는 `components` 및 `core`를 포함하고 있습니다.                                                                                                                             |
-| core       | 클러스터 관련 YAML이 위치하는 곳입니다. 현재 `secrets`에 imagePullSecret이, `ingresses`에 백엔드 ALB 인그레스가 포함되어 있습니다.                                                                                                                                                                                                                                                      |
-| components | GitOps 컨트롤러의 구성 요소가 있는 곳입니다.<br />Tekton, ArgoCD의 구성이 이 곳에 들어갑니다.<br /><br />기본적으로 리소스 접근을 위한 `RBAC`, 레포지토리 접근을 위한 `Secret`, 각 컨트롤러를 노출하기 위한 `Ingress` 등이 포함될 수 있습니다.<br /><br />- `tektonci`: 상기 기본 구성 외에, CI 파이프라인 및 웹훅 트리거 등으로 구성되어 있습니다. <br />- `argocd`: 기본 구성 외에, `ApplicationSet`, `AppProject` 등이 포함됩니다. 현재 `demo-appset`이 기본으로 구성되어 있습니다. |
-| apps       | 배포 대상 워크로드가 있는 곳입니다.<br /><br />Tekton에 의해 deployment가 업데이트 되며,<br />ArgoCD에 의해 배포됩니다.<br />                                                                                                                                                                                                                                                        |
+| Directory  | Description                                                                                                                                                                                                             |
+|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| bootstrap  | 클러스터 설정을 부트스트랩핑하는 항목입니다.<br />일반적으로 CRD 혹은 설치 매니페스트입니다. <br/><br />- `base` : 기본이 되는 설정입니다. ArgoCD, Tekton 매니페스트를 설치합니다.<br />- `overlays`: 클러스터 별 설정입니다.<br />현재 `overlays/default`는 `components` 및 `core`를 포함하고 있습니다. |
+| core       | 클러스터 관련 YAML이 위치하는 곳입니다. 현재 `secrets`에 imagePullSecret이 포함되어 있습니다.                                                                                                                                                      |
+| components | GitOps 컨트롤러의 구성 요소가 있는 곳입니다.<br />ArgoCD의 구성이 이 곳에 들어갑니다.<br /><br />기본적으로 리소스 접근을 위한 `RBAC`, 레포지토리 접근을 위한 `Secret`, 각 컨트롤러를 노출하기 위한 `Ingress` 등이 포함될 수 있습니다.<br />                                                     |
+| apps       | 배포 대상 워크로드가 있는 곳입니다.<br /><br />ArgoCD에 의해 배포됩니다.<br />                                                                                                                                                                 |
+| manifests  | 배포 대상 매니페스트가 있는 곳입니다.<br /><br />Tekton에 의해 알부 Manifests가 업데이트 됩니다.<br />                                                                                                                                               |
+| infra| 클러스터를 생성하기 위한 설정이 있는 곳입니다. <br /> terraform, kops 등 인프라 구성이 위치합니다.                                                                                                                                                      |
 
 ---
 
@@ -210,7 +169,7 @@ $ kubectl patch deploy -n argocd argocd-server --type json -p '[ { "op": "add", 
 Tekton 트리거에서 `MODULE_PATH`는,  
 
 1. 웹훅 페이로드에 명시된 변경된 파일 경로
-2. GitOps 레포지토리 `apps/` 하위의 매니페스트 경로
+2. GitOps 레포지토리 `manifests/` 하위의 매니페스트 경로
 
 
 를 나타냅니다. (두 항목의 이름이 일치해야 합니다.)
@@ -224,7 +183,7 @@ Tekton 트리거에서 `MODULE_PATH`는,
   
   
 ```yaml
-# components/tektonci/triggers/overlays/user/kustomization.yaml
+# manifests/tektonci/triggers/overlays/user/kustomization.yaml
 
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -250,7 +209,7 @@ patches:
 > 단순히 기본 트리거의 `1) name`, `2) MODULE_PATH`만 변경하는 패치입니다.
 
 ```yaml
-# components/tektonci/triggers/overlays/kustomization.yaml
+# manifests/tektonci/triggers/overlays/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: tektonci
@@ -281,7 +240,7 @@ resources:
   }
 ]
 ```
-> `components/tektonci/listeners/listener-patch.json`
+> `manifests/tektonci/listeners/listener-patch.json`
 
 
 ```bash
@@ -301,7 +260,7 @@ $ describe el -n tektonci | grep "Trigger Ref"
 파이프라인의 마지막은 현재 GitOps 레포지토리의 매니페스트를 업데이트하는 단계입니다.
 
 업데이트할 `backend/user`의 매니페스트가 현재 레포지토리에 존재하지 않습니다.
-`apps/backend/demo` 디렉토리를 참조하여,  
+`manifests/backend/demo` 디렉토리를 참조하여,  
 `user-service`의 `Deployment`, `Service` 등 매니페스트를 작성해주어야 합니다.  
   
 <br></br>
@@ -310,7 +269,7 @@ ArgoCD는 아직 새로 구성된 `user-service` 매니페스트에 대해 알�
 `Application` 리소스를 작성하여, ArgoCD가 이를 모니터링하도록 합니다.
 
 ```yaml
-# components/argocd/appsets/user-appset.yaml
+# apps/user-service/user-appset.yaml
 ...
       project: default
       source:
@@ -322,21 +281,21 @@ ArgoCD는 아직 새로 구성된 `user-service` 매니페스트에 대해 알�
 > `demo-appset.yaml`을 참고하여 나머지 부분도 적절하게 변경해줍니다.
 
 ```yaml
-# components/argocd/appsets/kustomization.yaml
+# apps/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: argocd
 resources:
-  - demo-appset.yaml
-  - user-appset.yaml
+  - demo-service
+  - user-service
 ```
 > 한 번에 관리할 수 있도록 리소스를 추가합니다.
 
 ```bash
-$ kubectl apply -k components/argocd/appsets
+$ kubectl apply -k apps/
 ```
 
-이제 ArgoCD 는 `apps/backend/user/...` 의 매니페스트를 쿠버네티스 클러스터와 레포지토리 상에서 모니터링합니다!
+이제 ArgoCD 는 `manifests/backend/user/...` 의 매니페스트를 쿠버네티스 클러스터와 레포지토리 상에서 모니터링합니다!
 
 ---
 
