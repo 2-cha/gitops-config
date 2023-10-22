@@ -4,4 +4,4 @@ namespace: redis-ha
 resources:
   - redis.yaml
   - haproxy.yaml
-
+  - ../../manifests/redis-ha
