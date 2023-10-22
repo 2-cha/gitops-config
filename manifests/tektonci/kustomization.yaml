@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: tektonci
 resources:
   - crd
-  - namespaces
+  - namespace
   - secrets
   - rbacs
   - listeners
